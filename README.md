@@ -1,5 +1,5 @@
 # Solution-to-Cahn-Hilliard-with-Flory-Huggins-equation
-This is a small part of my Master's thesis
+This is a only small part of my Master's thesis. It only works for square 2-d domain with area unit of 1. The other files are being refined to be uploaded onto github
 
 A publication using this code can be found here
 
