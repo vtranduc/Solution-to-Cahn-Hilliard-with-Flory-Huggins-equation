@@ -1,0 +1,191 @@
+function test13
+
+% function [xspinodal,yspinodal,xbinodal,ybinodal]=...
+%     compute_spinodal_binodal(n1,n2,entropy,Ttheta,nT,T_min)
+
+clear
+clc
+
+n1=1; %IT MUST BE 1!
+n2=100;
+entropy=1; %IT MUST BE 1!
+T_theta=1; %IT MUST BE 1!
+nT=100;
+T_min=0.001; %Must be larger than zero. Should be as close to 0 as possible
+nc_eachSide=100;
+c_min=0.001; %Must be larger than zero. Should be as close to 0 as possible
+c_max=0.999
+
+%Function-specific literals
+tol=1.0e-6;
+T_min_default_factor=0.0001; %Has to be less than 1
+
+%Compute cut-off or critical temperature
+gamma=2*n1*n2;
+A=gamma^2;
+B=-2*gamma*(n1+n2);
+C=(n2-n1)^2;
+Xcutoff1=(-B+sqrt(B^2-4*A*C))/(2*A);
+% Xcutoff2=(-B-sqrt(B^2-4*A*C))/(2*A);
+Tcutoff1=(((Xcutoff1-0.5)/entropy+1)^-1)/T_theta;
+% Tcutoff2=(((Xcutoff2-0.5)/entropy+1)^-1)/T_theta
+
+%Define temperature range to be evaluated based on cut-off temperature
+if T_min>=Tcutoff1
+    warning('T_min specified is larger than or equal to critical temperature. Default value is used instead')
+    T_=linspace(T_min_default_factor*Tcutoff1,Tcutoff1,nT);
+else
+    T_=linspace(T_min,Tcutoff1,nT);
+end
+   
+%Compute spinodal curve
+xspinodal=zeros(1,nT*2-1);
+yspinodal=[T_ T_(nT-1:-1:1)];
+for i=1:1:nT-1
+    T=T_(i);
+    chi=get_chi(T,entropy,T_theta);
+    alpha=2*chi*n1*n2;
+    beta=n1-n2-alpha;
+    radicant=beta^2-4*alpha*n2;
+    if abs(radicant)<=tol && radicant~=0
+        radicant=0;
+    elseif radicant<0
+        error('Error detected in computation of spinodal curve\nTemperature=%d does not yield inflection points\nCritical temperature is %d',T,Tcutoff1)
+    end
+    xspinodal(i)=(-beta-sqrt(radicant))/(2*alpha);
+    xspinodal(nT*2-i)=(-beta+sqrt(radicant))/(2*alpha);
+end
+chi=get_chi(Tcutoff1,entropy,T_theta);
+alpha=2*chi*n1*n2;
+beta=n1-n2-alpha;
+xspinodal(nT)=-beta/(2*alpha);
+
+figure(102)
+plot(xspinodal,yspinodal,'*')
+grid on
+
+%Recompute binodal curve
+xbinodal=zeros(1,nT*2-1);
+ybinodal=yspinodal;
+xbinodal(nT)=xspinodal(nT);
+syms c1 c2 m b
+guess=zeros(1,4);
+for k=1:1:nT-1
+    i=nT-k;
+    j=nT+k;
+    T=T_(i);
+    chi=get_chi(T,entropy,T_theta);
+    guess(1)=xspinodal(i)/2;
+    guess(2)=(xspinodal(j)+1)/2;
+    guess(3)=(freeE(xspinodal(j),n1,n2,chi)-freeE(xspinodal(i),n1,n2,chi))/...
+        (xspinodal(j)-xspinodal(i));
+    try
+        sol=vpasolve([dfreeE_dc1(c1,n1,n2,chi)==dfreeE_dc1(c2,n1,n2,chi),m==dfreeE_dc1(c1,n1,n2,chi),m*c1+b==freeE(c1,n1,n2,chi),m*c2+b==freeE(c2,n1,n2,chi)],[c1 c2 m b],guess);
+        xbinodal(i)=sol.c1;
+        xbinodal(j)=sol.c2;
+    catch
+        break
+    end
+end
+
+if k==1
+%     xbinodal(1:1:nT)=linspace(c_min,xspinodal(nT),nT);
+    xbinodal(nT:1:1:2*nT-1)=linspace(xbinodal(nT),c_max,nT);
+    guess(1)=ybinodal(nT);
+    guess(2)=xbinodal(nT)/2;
+    guess(3)=0;
+    c2=xspinodal(nT+1);
+    syms T
+    chi_symbolic=get_chi(T,entropy,T_theta);
+    sol=vpasolve([dfreeE_dc1(c1,n1,n2,chi_symbolic)==dfreeE_dc1(c2,n1,n2,chi_symbolic),m==dfreeE_dc1(c1,n1,n2,chi_symbolic),m*c1+b==freeE(c1,n1,n2,chi_symbolic),m*c2+b==freeE(c2,n1,n2,chi_symbolic)],[T c1 m b],guess);
+    try
+        xbinodal(nT-1)=sol.c1;
+        ybinodal(nT-1)=sol.T;
+        ybinodal(nT+1)=sol.T;
+        sol.c1
+        xbinodal(nT)
+        
+        sol.T
+    catch
+        error('Unable to compute binodal curve. Increase nT and/or decrease n2?')
+    end
+    k=2
+%     sol.T
+%     ybinodal(nT)
+elseif k==nT-1
+    return
+else
+    c1_remaining=nT-k;
+    xbinodal(1:1:c1_remaining+1)=...
+        linspace(c_min,xbinodal(c1_remaining+1),c1_remaining+1);
+    syms T
+    chi_symbolic=get_chi(T,entropy,T_theta);
+end
+error('Stop hereeeeeeeeeeeeeeeeeee')
+spacer=xbinodal(2)-xbinodal(1);
+
+for l=k:1:nT-1
+    i=nT-l;
+    j=nT+l;
+    c1=xbinodal(i);
+    guess(1)=-spacer...
+        *(ybinodal(i+2)-ybinodal(i+1))/(xbinodal(i+2)-xbinodal(i+1))...
+        +ybinodal(i+1);
+    
+%=========== Should I go trough all the computations for the slope? =======
+%     chi=get_chi(guess(1),entropy,T_theta); %Based on guessed value of T
+%     alpha=2*chi*n1*n2;
+%     beta=n1-n2-alpha;
+%     radicant=beta^2-4*alpha*n2;
+%     disp('checking 123')
+%     [l radicant chi guess(1) ybinodal(i+1) ybinodal(i+2) xbinodal(i+1) xbinodal(i+2)]
+%     disp('end checking')
+%     if abs(radicant)<=tol
+%         guess(3)=0;
+%     elseif radicant<0
+%         radicant
+% %         guess(3)=0;
+%         error('Error detected in computation of binodal curve\nGuessed temperature=%d does not yield inflection points\nCritical temperature is %d',guess(1),Tcutoff1)
+%     else
+%         xinflection1=(-beta-sqrt(radicant))/(2*alpha);
+%         xinflection2=(-beta+sqrt(radicant))/(2*alpha);
+%         guess(3)=(freeE(xinflection2,n1,n2,chi)-freeE(xinflection1,n1,n2,chi))...
+%              /(xinflection2-xinflection1);
+%     end
+    
+    guess(3)=0; %Bypass all
+%============== Fin ====================================================
+    
+    guess(2)=(xbinodal(j-1)+1)/2;
+%     guess(2)=0.999999
+    try
+        sol=vpasolve([dfreeE_dc1(c1,n1,n2,chi_symbolic)==dfreeE_dc1(c2,n1,n2,chi_symbolic),m==dfreeE_dc1(c1,n1,n2,chi_symbolic),m*c1+b==freeE(c1,n1,n2,chi_symbolic),m*c2+b==freeE(c2,n1,n2,chi_symbolic)],[T c2 m b],guess);
+        [l sol.T sol.c2 sol.m sol.b nT-1]
+        %c2 is expected to be never below c1
+        ybinodal(i)=sol.T;
+        ybinodal(j)=sol.T;
+        xbinodal(j)=sol.c2;
+    catch
+        warning('sup')
+        sol.T
+        sol.c2
+        sol.m
+        sol.b
+        break
+    end
+end
+
+hold on
+plot(xbinodal,ybinodal,'*')
+hold off
+
+end
+
+function solution=freeE(c1,n1,n2,chi)
+c2=1-c1;
+solution=c1*log(c1)/n1+c2*log(c2)/n2+c1*c2*chi;
+end
+
+function solution=dfreeE_dc1(c1,n1,n2,chi)
+solution=(1/n1-1/n2)+log(c1)/n1-log(1-c1)/n2+(1-2*c1)*chi;
+end

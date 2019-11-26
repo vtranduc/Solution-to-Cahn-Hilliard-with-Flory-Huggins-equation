@@ -1,0 +1,36 @@
+function test14
+
+clear
+clc
+
+%==========================================================================
+[xspinodal,yspinodal]=compute_spinodal_binodal();
+plot(xspinodal,yspinodal)
+grid on
+%==========================================================================
+n1=1; %IT MUST BE 1!
+n2=1000;
+entropy=1; %IT MUST BE 1!
+T_theta=1; %IT MUST BE 1!
+nT=100;
+T_min=0.001; %Must be larger than zero. Should be as close to 0 as possible
+nc_eachSide=100;
+c_min=0.001; %Must be larger than zero. Should be as close to 0 as possible
+c_max=0.9999999999999999999;
+%Function-specific literals
+tol=1.0e-6;
+T_min_default_factor=0.0001; %Has to be less than 1
+%==========================================================================
+syms c1 c2 m b
+
+
+end
+
+function solution=freeE(c1,n1,n2,chi)
+c2=1-c1;
+solution=c1*log(c1)/n1+c2*log(c2)/n2+c1*c2*chi;
+end
+
+function solution=dfreeE_dc1(c1,n1,n2,chi)
+solution=(1/n1-1/n2)+log(c1)/n1-log(1-c1)/n2+(1-2*c1)*chi;
+end

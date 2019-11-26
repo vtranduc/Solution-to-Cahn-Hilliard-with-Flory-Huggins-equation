@@ -1,0 +1,53 @@
+function test53
+
+clear
+clc
+
+%------------------------------
+
+nx=13;
+ny=12;
+nz=11;
+
+nex=nx-1;
+ney=ny-1;
+nez=nz-1;
+ne=nex*ney*nez;
+nexney=nex*ney;
+
+n=nx*ny*nz;
+
+x_coord=linspace(-1,1,nx);
+y_coord=linspace(-1,1,ny);
+z_coord=linspace(-1,1,nz);
+X=zeros(1,n);
+Y=zeros(1,n);
+Z=zeros(1,n);
+node=0;
+for zth=1:1:nz
+    for yth=1:1:ny
+        for xth=1:1:nx
+            node=node+1;
+            X(node)=x_coord(xth);
+            Y(node)=y_coord(yth);
+            Z(node)=z_coord(zth);
+        end
+    end
+end
+
+%------------------------------
+
+
+
+
+
+end
+
+function sol=map_to_sphere_with_ratio(xyz)
+
+ratio=max(abs(xyz));
+
+
+end
+
+function dist_from_origin

@@ -1,0 +1,212 @@
+function solution=septic_Hermite_basis(vals,orientation,type,order)
+
+%Vals must be between 0 and 1!
+
+if order==0
+    if type==0
+        if orientation==0
+            [m,n]=size(vals);
+            solution=ones(m,n)-35*vals.^4+84*vals.^5-70*vals.^6+20*vals.^7;
+        elseif orientation==1
+            solution=35*vals.^4-84*vals.^5+70*vals.^6-20*vals.^7;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==1
+        if orientation==0
+            solution=vals-20*vals.^4+45*vals.^5-36*vals.^6+10*vals.^7;
+        elseif orientation==1
+            solution=-15*vals.^4+39*vals.^5-34*vals.^6+10*vals.^7;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==2
+        if orientation==0
+            solution=0.5*vals.^2-5*vals.^4+10*vals.^5-7.5*vals.^6+2*vals.^7;
+        elseif orientation==1
+            solution=2.5*vals.^4-7*vals.^5+6.5*vals.^6-2*vals.^7;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==3
+        if orientation==0
+            solution=(1/6)*vals.^3-(2/3)*vals.^4+vals.^5-(2/3)*vals.^6+(1/6)*vals.^7;
+        elseif orientation==1
+            solution=(-1/6)*vals.^4+0.5*vals.^5-0.5*vals.^6+(1/6)*vals.^7;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    else
+        error('Type must be one of 0, 1, 2, or 3!')
+    end
+
+%First derivative=======================================
+
+elseif order==1
+    if type==0
+        if orientation==0
+            solution=140*vals.^6-420*vals.^5+420*vals.^4-140*vals.^3;
+        elseif orientation==1
+            solution=-140*vals.^6+420*vals.^5-420*vals.^4+140*vals.^3;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==1
+        if orientation==0
+            [m,n]=size(vals);
+            solution=70*vals.^6-216*vals.^5+225*vals.^4-80*vals.^3+ones(m,n);
+        elseif orientation==1
+            solution=70*vals.^6-204*vals.^5+195*vals.^4-60*vals.^3;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==2
+        if orientation==0
+            solution=14*vals.^6-45*vals.^5+50*vals.^4-20*vals.^3+vals;
+        elseif orientation==1
+            solution=-14*vals.^6+39*vals.^5-35*vals.^4+10*vals.^3;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==3
+        if orientation==0
+            solution=(7/6)*vals.^6-4*vals.^5+5*vals.^4-(8*vals.^3)/3+vals.^2/2;
+        elseif orientation==1
+            solution=(7/6)*vals.^6-3*vals.^5+2.5*vals.^4-(2/3)*vals.^3;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    else
+        error('Type must be one of 0, 1, 2, or 3!')
+    end
+
+%Second derivative=======================================
+elseif order==2
+    if type==0
+        if orientation==0
+            solution=840*vals.^5-2100*vals.^4+1680*vals.^3-420*vals.^2;
+        elseif orientation==1
+            solution=-840*vals.^5+2100*vals.^4-1680*vals.^3+420*vals.^2;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==1
+        if orientation==0
+            solution=420*vals.^5-1080*vals.^4+900*vals.^3-240*vals.^2;
+        elseif orientation==1
+            solution=420*vals.^5-1020*vals.^4+780*vals.^3-180*vals.^2;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==2
+        if orientation==0
+            [m,n]=size(vals);
+            solution=84*vals.^5-225*vals.^4+200*vals.^3-60*vals.^2+ones(m,n);
+        elseif orientation==1
+            solution=-84*vals.^5+195*vals.^4-140*vals.^3+30*vals.^2;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==3
+        if orientation==0
+            solution=7*vals.^5-20*vals.^4+20*vals.^3-8*vals.^2+vals;
+        elseif orientation==1
+            solution=7*vals.^5-15*vals.^4+10*vals.^3-2*vals.^2;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    else
+        error('Type must be one of 0, 1, 2, or 3!')
+    end
+
+%Third derivative =====================================================
+
+elseif order==3
+    if type==0
+        if orientation==0
+            solution=4200*vals.^4-8400*vals.^3+5040*vals.^2-840*vals;
+        elseif orientation==1
+            solution=-4200*vals.^4+8400*vals.^3-5040*vals.^2+840*vals;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==1
+        if orientation==0
+            solution=2100*vals.^4-4320*vals.^3+2700*vals.^2-480*vals;
+        elseif orientation==1
+            solution=2100*vals.^4-4080*vals.^3+2340*vals.^2-360*vals;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==2
+        if orientation==0
+            solution=420*vals.^4-900*vals.^3+600*vals.^2-120*vals;
+        elseif orientation==1
+            solution=-420*vals.^4+780*vals.^3-420*vals.^2+60*vals;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==3
+        if orientation==0
+            [m,n]=size(vals);
+            solution=35*vals.^4-80*vals.^3+60*vals.^2-16*vals+ones(m,n);
+        elseif orientation==1
+            solution=35*vals.^4-60*vals.^3+30*vals.^2-4*vals;
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    else
+        error('Type must be one of 0, 1, 2, or 3!')
+    end
+    
+%Fourth derivative ========================================================
+    
+elseif order==4
+    if type==0
+        if orientation==0
+            [m,n]=size(vals);
+            solution=16800*vals.^3-25200*vals.^2+10080*vals-840*ones(m,n);
+        elseif orientation==1
+            [m,n]=size(vals);
+            solution=-16800*vals.^3+25200*vals.^2-10080*vals+840*ones(m,n);
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==1
+        if orientation==0
+            [m,n]=size(vals);
+            solution=8400*vals.^3-12960*vals.^2+5400*vals-480*ones(m,n);
+        elseif orientation==1
+            [m,n]=size(vals);
+            solution=8400*vals.^3-12240*vals.^2+4680*vals-360*ones(m,n);
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==2
+        if orientation==0
+            [m,n]=size(vals);
+            solution=1680*vals.^3-2700*vals.^2+1200*vals-120*ones(m,n);
+        elseif orientation==1
+            [m,n]=size(vals);
+            solution=-1680*vals.^3+2340*vals.^2-840*vals+60*ones(m,n);
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    elseif type==3
+        if orientation==0
+            [m,n]=size(vals);
+            solution=140*vals.^3-240*vals.^2+120*vals-16*ones(m,n);
+        elseif orientation==1
+            [m,n]=size(vals);
+            solution=140*vals.^3-180*vals.^2+60*vals-4*ones(m,n);
+        else
+            error('Orientation must be either 0 or 1!')
+        end
+    else
+        error('Type must be one of 0, 1, 2, or 3!')
+    end
+else
+    error('Only orders of 0, 1, 2, 3, and 4 are available!')
+end
+
+end
